@@ -1,5 +1,5 @@
 import express from 'express';
-import { testing } from '../controllers/authController.js';
+import { login, signup, testing } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -8,4 +8,14 @@ router.get(
     testing
 );
 
-export default router
+router.post(
+    '/signup',
+    signup
+);
+
+router.post(
+    '/login',
+    login
+);
+
+export default router;

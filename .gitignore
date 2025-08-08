@@ -2,5 +2,7 @@ node_modules/
 misc/
 .vs/
 .vscode/
+logs/
 secrets.json
 .env
+.log
