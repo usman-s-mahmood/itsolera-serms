@@ -107,7 +107,7 @@ export const login = async (req, res) => {
             token, {
                 httpOnly: true,
                 sameSite: 'Strict',
-                secure: process.env.NODE_ENV !== 'production',
+                secure: process.env.NODE_ENV === 'production',
                 maxAge: 24 * 60 * 60 * 1000
             }
         );
@@ -138,6 +138,29 @@ export const login = async (req, res) => {
     }
 }
 
+export const logout = async (req, res) => {
+    try {
+        const token = req.cookies?.auth_token;
+        console.log(`Auth Cookie: ${req.cookies?.auth_token}\nBoolean Value: ${!!req.cookies?.auth_token}`);
+
+        if (!token) 
+            return res.status(401).json({ error: "No active session!" });
+
+        res.cookie('auth_token', '', {
+            httpOnly: true,
+            sameSite: 'Strict',
+            secure: process.env.NODE_ENV === 'production',
+            expires: new Date(0)
+        });
+
+        return res.status(200).json({ message: "Logout Successful" });
+
+    } catch (error) {
+        console.error(`Logout Error: ${error}`);
+        logger.error('Logout error', { error, route: 'logout' });
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
 
 
 
