@@ -141,7 +141,6 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         const token = req.cookies?.auth_token;
-        console.log(`Auth Cookie: ${req.cookies?.auth_token}\nBoolean Value: ${!!req.cookies?.auth_token}`);
 
         if (!token) 
             return res.status(401).json({ error: "No active session!" });
