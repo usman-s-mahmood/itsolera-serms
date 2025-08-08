@@ -86,7 +86,13 @@ export const login = async (req, res) => {
 
         if (!user.isActive)
             return res.status(403).json({error: "Account is deactivated"});
+        const isMatch = await bcrypt.compare(
+            password,
+            user.password
+        );
 
+        if (!isMatch) 
+            return res.status(401).json({error: "Invalid Credentials"});
         const token = jwt.sign(
             {
                 id: user._id,
