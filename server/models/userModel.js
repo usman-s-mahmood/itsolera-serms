@@ -35,8 +35,9 @@ const userSchema = new mongoose.Schema({
         default: ''
     },
     branch: {
-        type: String,
-        default: ''
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        default: null
     },
     isActive: {
         type: Boolean,

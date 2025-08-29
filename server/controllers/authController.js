@@ -283,6 +283,34 @@ export const userInfo = async (req, res) => {
     }
 }
 
+export const deleteUser = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const {password} = req.body;
+
+        const user = await User.findById(userId);
+        const passwordCheck = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!passwordCheck)
+            return res.status(403).json({error: "Password Mismatch!"});
+
+        await User.findByIdAndDelete(userId);
+        res.cookie('auth_token', '', {
+            httpOnly: true,
+            sameSite: 'Strict',
+            secure: process.env.NODE_ENV === 'production',
+            expires: new Date(0)
+        });
+        return res.json({message: 'User Deleted Successfully!'});
+    } catch(error) {
+        console.error(`User Delete Error: ${error}`);
+        logger.error('User Delete Error', { error, route: 'delete user' });
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
 
 
 

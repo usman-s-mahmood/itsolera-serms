@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import path from 'path'
 import authRoutes from './routes/authRoutes.js'
+import branchRoutes from './routes/branchRoutes.js'
 import mongoConnection from './db/mongoConnection.js';
 import dotenv from 'dotenv';
 
@@ -21,6 +22,11 @@ app.get('/test', async (req, res) => {
 app.use(
     '/api/auth',
     authRoutes
+);
+
+app.use(
+    '/api/branch',
+    branchRoutes
 );
 
 app.listen(PORT, () => {
