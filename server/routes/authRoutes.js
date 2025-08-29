@@ -1,5 +1,6 @@
 import express from 'express';
-import { login, logout, signup, testing } from '../controllers/authController.js';
+import { editPassword, editUser, login, logout, signup, testing, userInfo } from '../controllers/authController.js';
+import tokenCheck from '../middleware/tokenCheck.js';
 
 const router = express.Router();
 
@@ -21,6 +22,24 @@ router.post(
 router.post(
     '/logout',
     logout
+);
+
+router.post(
+    '/edit-user',
+    tokenCheck,
+    editUser
+);
+
+router.post(
+    '/edit-password',
+    tokenCheck,
+    editPassword
+);
+
+router.post(
+    '/user-info',
+    tokenCheck,
+    userInfo
 );
 
 export default router;

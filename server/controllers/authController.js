@@ -161,6 +161,130 @@ export const logout = async (req, res) => {
     }
 };
 
+export const editUser = async (req, res) => {
+    try {
+        const userId = req.user._id; 
+
+        const {
+            firstName,
+            lastName,
+            username,
+            email,
+            phone,
+            profilePic
+        } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) 
+            return res.status(404).json({ error: "User not found" });
+
+        if (username && username !== user.username) {
+            const usernameExists = await User.findOne({ username });
+            if (usernameExists) 
+                return res.status(403).json({ error: "Username already in use" });
+            
+            user.username = username;
+        }
+
+        if (email && email !== user.email) {
+            const emailExists = await User.findOne({ email });
+            if (emailExists) 
+                return res.status(403).json({ error: "Email already in use" });
+            user.email = email.toLowerCase();
+        }
+
+        if (phone !== undefined && phone !== user.phone && phone !== '') {
+            const phoneExists = await User.findOne({ phone });
+            if (phoneExists) 
+                return res.status(403).json({ error: "Phone number already in use" });
+            user.phone = phone;
+        } 
+
+        
+        if (firstName) 
+            user.firstName = firstName;
+        if (lastName) 
+            user.lastName = lastName;
+        if (phone !== undefined) 
+            user.phone = phone;
+        if (profilePic !== undefined) 
+            user.profilePic = profilePic;
+
+        await user.save();
+        const userQuery = await User.findById(user.id).select('-password');
+
+        return res.status(200).json({ message: "User updated successfully", userQuery });
+    } catch (error) {
+        console.error('Edit user error:', error);
+        console.error(`Edit user Error: ${error}`);
+        logger.error('Edit user Error', { error, route: 'edit-user' });
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const editPassword = async (req, res) => {
+    try {
+        const userID = req.user._id;
+        const {
+            old_password,
+            new_password,
+            confirm_password
+        } = req.body;
+
+        const user = await User.findById(userID);
+
+        if (!user)
+            return res.status(404).json({error: "User Not Found"})
+
+        const oldPasswordCheck = await bcrypt.compare(
+            old_password,
+            user.password
+        );
+
+        if (!oldPasswordCheck)
+            return res.status(403).json({error: 'Invalid Old Password!'});
+
+        if (new_password.toString() !== confirm_password.toString()) 
+            return res.status(403).json({error: "New Password and confirm Password mismatch!"});
+
+        const salt = await bcrypt.genSalt(10);
+        const newPassword = await bcrypt.hash(
+            new_password,
+            salt
+        );
+
+        user.password = await newPassword;
+        await user.save();
+
+        return res.json({message: "password updated successfully!"});
+
+    } catch (error) {
+        console.error(`Edit Password Error: ${error}`);
+        logger.error('Edit Password Error', { error, route: 'edit-password' });
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+export const userInfo = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const user = await User.findById(userId).select('-password');
+
+        if (!user)
+            return res.status(404).json({message: "User Not Found"});
+
+        return res.json({message: "User Found Successfully!", user});
+        
+    } catch (error) {
+        console.error(`User Info Error: ${error}`);
+        logger.error('User Info Error', { error, route: 'user-info' });
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+
+
 
 
 
